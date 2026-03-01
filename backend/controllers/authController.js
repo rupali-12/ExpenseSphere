@@ -6,7 +6,7 @@ import PasswordResetUser from "../models/passwordResetModel.js"
 import { generateOTP } from "../utils/generateOTP.js";
 import { sendEmail } from "../utils/sendEmail.js";
 
-// 🔹 Generate JWT and send cookie
+// Generate JWT and send cookie
 const generateToken = (res, userId) => {
   const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN || "30d",
@@ -22,9 +22,7 @@ const generateToken = (res, userId) => {
   return token;
 };
 
-//
-// 🔹 STEP 1: Register user and send OTP
-//
+// STEP 1: Register user and send OTP
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -42,7 +40,7 @@ export const registerUser = async (req, res) => {
     // Generate OTP + hash
     const { otp, otpHash } = await generateOTP();
 
-    // ✅ Save temporarily in PendingUser (password NOT hashed)
+    // Save temporarily in PendingUser (password NOT hashed)
     const pendingUser = new PendingUser({
       name,
       email,
@@ -72,9 +70,7 @@ export const registerUser = async (req, res) => {
   }
 };
 
-//
-// 🔹 STEP 2: Verify OTP and create actual user
-//
+// STEP 2: Verify OTP and create actual user
 export const verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
@@ -90,17 +86,17 @@ export const verifyOTP = async (req, res) => {
     if (!isMatch)
       return res.status(400).json({ message: "Invalid OTP" });
 
-    // ✅ Hash password here before saving to real user DB
+    // Hash password here before saving to real user DB
     const hashedPassword = await bcrypt.hash(pendingUser.password, 10);
 
-    // ✅ Create verified user
+    // Create verified user
     const user = await User.create({
       name: pendingUser.name,
       email: pendingUser.email,
       password: hashedPassword,
     });
 
-    // ✅ Remove pending record to clean up
+    // Remove pending record to clean up
     await PendingUser.deleteOne({ email });
 
     const token = generateToken(res, user._id);
@@ -117,9 +113,7 @@ export const verifyOTP = async (req, res) => {
   }
 };
 
-//
-// 🔹 STEP 3: Resend OTP
-//
+// STEP 3: Resend OTP
 export const resendOTP = async (req, res) => {
   try {
     const { email } = req.body;
@@ -148,15 +142,13 @@ export const resendOTP = async (req, res) => {
   }
 };
 
-//
-// 🔹 STEP 4: Normal Login
-//
+// STEP 4: Normal Login
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).select("+password");
 
-    // ✅ Use matchPassword method correctly
+    // Use matchPassword method correctly
     if (user && (await user.matchPassword(password))) {
       const token = generateToken(res, user._id);
       res.json({
@@ -175,9 +167,7 @@ export const loginUser = async (req, res) => {
   }
 };
 
-//
-// 🔹 STEP 5: Logout + Get Profile
-//
+// STEP 5: Logout + Get Profile
 export const logoutUser = (req, res) => {
   res.cookie("jwt", "", { httpOnly: true, expires: new Date(0) });
   res.json({ message: "Logged out successfully" });
@@ -197,9 +187,7 @@ export const getProfile = async (req, res) => {
   }
 };
 
-//
-// 🔹 STEP 6: Update Balance
-//
+// STEP 6: Update Balance
 export const updateBalance = async (req, res) => {
   try {
     const { currentBalance } = req.body;

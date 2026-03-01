@@ -11,7 +11,7 @@ const pendingUserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// 🔹 Automatically delete expired pending users after 10 minutes (optional)
+// Automatically delete expired pending users after 10 minutes 
 pendingUserSchema.index({ otpExpires: 1 }, { expireAfterSeconds: 600 });
 
 export default mongoose.model("PendingUser", pendingUserSchema);

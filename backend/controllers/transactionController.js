@@ -95,7 +95,7 @@ export const getTransactions = async (req, res) => {
     // Get total count
     const total = await Transaction.countDocuments(query);
 
-    // 🔹 Aggregate summary for visible range (total deposits/withdrawals)
+    // Aggregate summary for visible range (total deposits/withdrawals)
     const summary = await Transaction.aggregate([
       { $match: query },
       {
