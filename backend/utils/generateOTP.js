@@ -6,5 +6,3 @@ export const generateOTP = async () => {
   return { otp, otpHash };
 };
 
-// ExpenseTracker
-// neqf luzw rfgg spmg

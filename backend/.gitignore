@@ -1,3 +1,4 @@
 /node_modules
 .env
 ExpenseTracker_Backend_Documentation.docx
+/coverage
