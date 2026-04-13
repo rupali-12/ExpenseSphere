@@ -23,11 +23,32 @@ const vitestConfig = defineVitestConfig({
     setupFiles: ['./src/tests/setup.ts'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'html'],
-      include: ['src/**/*.{ts,vue}'],
-      exclude: ['src/tests/**', 'src/main.ts'],
+      reporter: ['text', 'text-summary', 'html'],
+      include: [
+        'src/utils/**/*.ts',
+        'src/api/**/*.ts',
+        'src/stores/**/*.ts',
+        'src/composables/**/*.ts',
+        'src/components/common/**/*.vue',
+        'src/components/transactions/**/*.vue',
+        'src/views/**',
+        'src/components/layout/**',
+      ],
+      exclude: [
+        'src/tests/**',
+        'src/main.ts',
+        'src/vite-env.d.ts',
+        'src/types/**',
+        'src/router/**',
+        'src/App.vue',
+      ],
+      thresholds: {
+        statements: 50,
+        branches:   40,
+        functions:  50,
+        lines:      50,
+      }
     },
   },
 })
-
 export default mergeConfig(viteConfig, vitestConfig)
