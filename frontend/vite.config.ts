@@ -3,11 +3,36 @@ import { defineConfig as defineVitestConfig } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 import { fileURLToPath, URL } from 'node:url'
+import { VitePWA } from 'vite-plugin-pwa'
 
 const viteConfig = defineConfig({
   plugins: [
     vue(),
     tailwindcss(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      manifest: {
+        name: 'ExpenseSphere',
+        short_name: 'ES',
+        description: 'Personal Finance Tracker',
+        theme_color: '#1A365D',
+        background_color: '#1A365D',
+        display: 'standalone',
+        start_url: '/',
+        icons: [
+          {
+            src: '/icon-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+          },
+          {
+            src: '/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+          },
+        ],
+      },
+    }),
   ],
   resolve: {
     alias: {
@@ -15,12 +40,12 @@ const viteConfig = defineConfig({
     }
   },
   build: {
-    outDir: 'dist',        // Vercel expects dist by default — explicit is cleaner
-    sourcemap: false,      // don't ship sourcemaps to production
+    outDir: 'dist',
+    sourcemap: false,
     chunkSizeWarningLimit: 600,
   },
   server: {
-    port: 5173,            // local dev only, ignored by Vercel
+    port: 5173,
   },
 })
 
@@ -59,4 +84,5 @@ const vitestConfig = defineVitestConfig({
     },
   },
 })
+
 export default mergeConfig(viteConfig, vitestConfig)
