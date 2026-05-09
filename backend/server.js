@@ -17,6 +17,8 @@ app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
       'http://localhost:5173',
+      'https://expense-sphere-itklnw1kr-rupali12s-projects.vercel.app/',
+      'https://expense-sphere-git-master-rupali12s-projects.vercel.app/',
       process.env.FRONTEND_URL,
     ]
     if (!origin || allowedOrigins.includes(origin)) {
