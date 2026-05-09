@@ -14,6 +14,14 @@ const viteConfig = defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
+  build: {
+    outDir: 'dist',        // Vercel expects dist by default — explicit is cleaner
+    sourcemap: false,      // don't ship sourcemaps to production
+    chunkSizeWarningLimit: 600,
+  },
+  server: {
+    port: 5173,            // local dev only, ignored by Vercel
+  },
 })
 
 const vitestConfig = defineVitestConfig({
