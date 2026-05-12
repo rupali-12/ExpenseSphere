@@ -38,17 +38,19 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // ─── Register Step 2 — Verify OTP -────
-  const verifyOtp = async (payload: VerifyOtpPayload) => {
-    const response = await verifyOtpApi(payload)
-    user.value = {
-      _id: response.data._id,
-      name: response.data.name,
-      email: response.data.email,
-      currentBalance: 0,
-    }
-    isAuthenticated.value = true
-    return response.data
+ const verifyOtp = async (payload: VerifyOtpPayload) => {
+  const response = await verifyOtpApi(payload)
+  // ─── Save token to localStorage ───
+  localStorage.setItem("token", response.data.token)
+  user.value = {
+    _id: response.data._id,
+    name: response.data.name,
+    email: response.data.email,
+    currentBalance: 0,
   }
+  isAuthenticated.value = true
+  return response.data
+}
 
   // ─── Resend OTP -───────
   const resendOtp = async (email: string) => {
@@ -57,25 +59,29 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // ─── Login -────
-  const login = async (payload: LoginPayload) => {
-    const response = await loginApi(payload)
-    user.value = {
-      _id: response.data._id,
-      name: response.data.name,
-      email: response.data.email,
-      currentBalance: 0,
-    }
-    isAuthenticated.value = true
-    return response.data
+ const login = async (payload: LoginPayload) => {
+  const response = await loginApi(payload)
+  // ─── Save token to localStorage ───
+  localStorage.setItem("token", response.data.token)
+  user.value = {
+    _id: response.data._id,
+    name: response.data.name,
+    email: response.data.email,
+    currentBalance: 0,
   }
+  isAuthenticated.value = true
+  return response.data
+}
 
   // ─── Logout -────
-  const logout = async () => {
-    await logoutApi()
-    user.value = null
-    isAuthenticated.value = false
-    resetToken.value = ''
-  }
+ const logout = async () => {
+  await logoutApi()
+  // ─── Clear token from localStorage ───
+  localStorage.removeItem("token")
+  user.value = null
+  isAuthenticated.value = false
+  resetToken.value = ''
+}
 
   // ─── Fetch Profile -──────
   // Called on app load to restore session from cookie

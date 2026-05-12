@@ -1,6 +1,5 @@
 import axios from "axios";
 
-// Create Base instance
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
@@ -9,15 +8,13 @@ const api = axios.create({
   },
 });
 
-// ─── Request Interceptor ─────────────────────────────────────────────────────
-// Runs before every request is sent
+// ─── Request Interceptor ──────────────────────────────────────────────────────
 api.interceptors.request.use(
   (config) => handleRequest(config),
   (error) => Promise.reject(error),
 );
 
-// ─── Response Interceptor ────────────────────────────────────────────────────
-// Runs after every response comes back
+// ─── Response Interceptor ─────────────────────────────────────────────────────
 api.interceptors.response.use(
   (response) => handleResponse(response),
   (error) => handleResponseError(error),
@@ -25,21 +22,25 @@ api.interceptors.response.use(
 
 export default api;
 
-// Exported helpers for easier unit testing
 export function handleRequest(config: any) {
-  return config;
+  // Attach token from localStorage to every request
+  const token = localStorage.getItem("token")
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
 }
 
 export function handleResponse(response: any) {
-  // If response is successful just return it as is
   return response;
 }
 
 export function handleResponseError(error: any) {
-  // Global error handling
   const status = error.response?.status;
 
   if (status === 401 && !error.config.url.includes("/login")) {
+    // Clear token and redirect to login
+    localStorage.removeItem("token")
     window.location.href = "/login";
   }
 
