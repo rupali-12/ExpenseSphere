@@ -90,39 +90,34 @@ const router = createRouter({
 
 // ─── Navigation Guard ─────────────────────────────────────────────────────────
 // Runs before EVERY route change
-router.beforeEach(async (to, _from, next) => {
+// router/index.ts
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
+  const token = localStorage.getItem("token")
 
-  const requiresAuth = to.meta.requiresAuth
-  const guestOnly = to.meta.guestOnly
-
-  // ─── Case 1: Route needs auth ─────────────────────────────────────────────
-  if (requiresAuth) {
-    if (authStore.isAuthenticated) {
-      // Already logged in — allow
-      next()
-    } else {
-      // Not logged in — try to restore session from cookie
+  // If route requires auth
+  if (to.meta.requiresAuth) {
+    if (!token) {
+      // No token — go to login
+      return next("/login")
+    }
+    // Has token but store not loaded yet — fetch profile
+    if (!authStore.isAuthenticated) {
       try {
         await authStore.fetchProfile()
-        // Cookie was valid — session restored
-        next()
       } catch {
-        // Cookie invalid or expired — redirect to login
-        next({ name: 'Login' })
+        localStorage.removeItem("token")
+        return next("/login")
       }
     }
-    return
+    return next()
   }
 
-  // ─── Case 2: Guest only route (login, register etc) ───────────────────────
-  if (guestOnly && authStore.isAuthenticated) {
-    // Already logged in — don't show login page again
-    next({ name: 'Dashboard' })
-    return
+  // If route is guest only (login/register) and user is logged in
+  if (to.meta.guestOnly && token) {
+    return next("/app/dashboard")
   }
 
-  // ─── Case 3: Public route — allow everyone ────────────────────────────────
   next()
 })
 

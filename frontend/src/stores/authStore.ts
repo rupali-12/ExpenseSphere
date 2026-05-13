@@ -38,17 +38,13 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // ─── Register Step 2 — Verify OTP -────
- const verifyOtp = async (payload: VerifyOtpPayload) => {
+const verifyOtp = async (payload: VerifyOtpPayload) => {
   const response = await verifyOtpApi(payload)
-  // ─── Save token to localStorage ───
+  // Save token first so fetchProfile can use it
   localStorage.setItem("token", response.data.token)
-  user.value = {
-    _id: response.data._id,
-    name: response.data.name,
-    email: response.data.email,
-    currentBalance: 0,
-  }
   isAuthenticated.value = true
+  // Fetch real profile — gets actual currentBalance from DB
+  await fetchProfile()
   return response.data
 }
 
@@ -59,24 +55,20 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // ─── Login -────
- const login = async (payload: LoginPayload) => {
+const login = async (payload: LoginPayload) => {
   const response = await loginApi(payload)
-  // ─── Save token to localStorage ───
+  // Save token first so fetchProfile can use it
   localStorage.setItem("token", response.data.token)
-  user.value = {
-    _id: response.data._id,
-    name: response.data.name,
-    email: response.data.email,
-    currentBalance: 0,
-  }
   isAuthenticated.value = true
+  // Fetch real profile — gets actual currentBalance from DB
+  await fetchProfile()
   return response.data
 }
 
   // ─── Logout -────
  const logout = async () => {
   await logoutApi()
-  // ─── Clear token from localStorage ───
+  // Clear everything
   localStorage.removeItem("token")
   user.value = null
   isAuthenticated.value = false
@@ -84,13 +76,12 @@ export const useAuthStore = defineStore('auth', () => {
 }
 
   // ─── Fetch Profile -──────
-  // Called on app load to restore session from cookie
   const fetchProfile = async () => {
-    const response = await getProfileApi()
-    user.value = response.data
-    isAuthenticated.value = true
-    return response.data
-  }
+  const response = await getProfileApi()
+  user.value = response.data
+  isAuthenticated.value = true
+  return response.data
+}
 
   // ─── Update Balance -────
   const updateBalance = async (payload: UpdateBalancePayload) => {
