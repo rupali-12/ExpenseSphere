@@ -48,3 +48,12 @@ export interface GetTransactionsResponse {
   netChange: number
   data: Transaction[]
 }
+
+export interface EditNotePayload {
+  note: string
+}
+
+export interface EditNoteResponse {
+  message: string
+  transaction: Transaction
+}

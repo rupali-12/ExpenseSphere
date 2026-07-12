@@ -2,6 +2,8 @@ import api from './axiosInstance'
 import type {
   AddTransactionPayload,
   AddTransactionResponse,
+  EditNotePayload,
+  EditNoteResponse,
   GetTransactionsResponse,
   TransactionFilters,
 } from '@/types/transaction.types'
@@ -21,3 +23,6 @@ export const getTransactionsApi = (filters: TransactionFilters = {}) => {
 
   return api.get<GetTransactionsResponse>(`${BASE}/get-transactions`, { params })
 }
+
+export const editTransactionNoteApi = (id: string, payload: EditNotePayload) =>
+  api.put<EditNoteResponse>(`${BASE}/${id}/note`, payload)

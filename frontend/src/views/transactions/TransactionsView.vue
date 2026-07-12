@@ -79,7 +79,7 @@
       </div>
 
       <!-- Empty -->
-      <div v-else-if="txStore.transactions.length === 0"
+      <div v-else-if="!txStore.transactions?.length"
         class="flex flex-col items-center justify-center py-16 text-center">
         <div class="w-14 h-14 rounded-2xl bg-[#F0F4F8] flex items-center justify-center mb-3">
           <svg class="w-7 h-7 text-[#94A3B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -92,9 +92,9 @@
 
       <!-- Rows -->
       <div v-else>
-        <div v-for="(tx, i) in txStore.transactions" :key="tx._id"
+        <div v-for="(tx, i) in (txStore.transactions ?? [])":key="tx._id"
           :class="['grid grid-cols-12 gap-2 px-5 py-3.5 border-b border-[#F1F5F9] hover:bg-[#F8FAFC] transition-colors items-center',
-            i === txStore.transactions.length - 1 ? 'border-0' : '']">
+           i === (txStore.transactions?.length ?? 0) - 1 ? 'border-0' : '']">
 
           <!-- Date -->
           <div class="col-span-2">
@@ -136,7 +136,7 @@
     </div>
 
     <!-- ── Pagination ─────────────────────────────────────────────────── -->
-    <div v-if="txStore.pages > 1"
+    <div v-if="(txStore.pages ?? 0) > 1"
       class="flex items-center justify-between bg-white rounded-2xl border border-[#E2E8F0] shadow-sm px-5 py-3 animate-fade-up delay-300">
       <p class="text-xs text-[#64748B]">
         Showing page <span class="font-bold text-[#1E293B]">{{ txStore.currentPage }}</span> of
@@ -144,7 +144,7 @@
         · <span class="font-bold text-[#1E293B]">{{ txStore.total }}</span> total
       </p>
       <div class="flex items-center gap-1">
-        <button @click="txStore.changePage(txStore.currentPage - 1)"
+        <button @click="txStore.changePage?.(txStore.currentPage - 1)"
           :disabled="txStore.currentPage === 1"
           class="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#F0F4F8] disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -152,14 +152,14 @@
           </svg>
         </button>
         <button v-for="page in visiblePages" :key="page"
-          @click="typeof page === 'number' && txStore.changePage(page)"
+          @click="typeof page === 'number' && txStore.changePage?.(page)"
           :class="['w-8 h-8 rounded-lg text-sm font-semibold transition-colors',
             page === txStore.currentPage
               ? 'bg-[#1A365D] text-white'
               : page === '...' ? 'cursor-default text-[#94A3B8]' : 'text-[#64748B] hover:bg-[#F0F4F8]']">
           {{ page }}
         </button>
-        <button @click="txStore.changePage(txStore.currentPage + 1)"
+        <button @click="txStore.changePage?.(txStore.currentPage + 1)"
           :disabled="txStore.currentPage === txStore.pages"
           class="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#F0F4F8] disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -190,14 +190,14 @@ const localFilters = reactive({
 })
 
 const summary = computed(() => [
-  { label: 'Total Deposits',    value: txStore.totalDeposits,    color: 'text-[#059669]' },
-  { label: 'Total Withdrawals', value: txStore.totalWithdrawals, color: 'text-[#DC2626]' },
-  { label: 'Net Change',        value: txStore.netChange,        color: txStore.netChange >= 0 ? 'text-[#059669]' : 'text-[#DC2626]' },
+  { label: 'Total Deposits',    value: txStore.totalDeposits ?? 0,    color: 'text-[#059669]' },
+  { label: 'Total Withdrawals', value: txStore.totalWithdrawals ?? 0, color: 'text-[#DC2626]' },
+  { label: 'Net Change',        value: txStore.netChange ?? 0,        color: (txStore.netChange ?? 0) >= 0 ? 'text-[#059669]' : 'text-[#DC2626]' },
 ])
 
 const visiblePages = computed(() => {
-  const total = txStore.pages
-  const current = txStore.currentPage
+  const total = txStore.pages ?? 0
+  const current = txStore.currentPage ?? 1
   const pages: (number | string)[] = []
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
   pages.push(1)
@@ -208,11 +208,11 @@ const visiblePages = computed(() => {
   return pages
 })
 
-const applyFilters = () => txStore.applyFilters({ ...localFilters })
+const applyFilters = () => txStore.applyFilters?.({ ...localFilters })
 const resetFilters = () => {
   Object.assign(localFilters, { search: '', type: '', startDate: '', endDate: '' })
-  txStore.resetFilters()
+  txStore.resetFilters?.()
 }
 
-onMounted(() => txStore.fetchTransactions())
+onMounted(() => txStore.fetchTransactions?.())
 </script>

@@ -29,7 +29,7 @@
             </svg>
           </div>
         </div>
-        <p class="font-mono text-2xl font-bold text-[#059669]">₹{{ formatAmount(txStore.totalDeposits) }}</p>
+        <p class="font-mono text-2xl font-bold text-[#059669]">₹{{ formatAmount(txStore.totalDeposits ?? 0) }}</p>
         <p class="text-[#94A3B8] text-xs mt-1">{{ txStore.total }} transactions total</p>
       </div>
 
@@ -43,8 +43,8 @@
             </svg>
           </div>
         </div>
-        <p class="font-mono text-2xl font-bold text-[#DC2626]">₹{{ formatAmount(txStore.totalWithdrawals) }}</p>
-        <p class="text-[#94A3B8] text-xs mt-1">Net: ₹{{ formatAmount(txStore.netChange) }}</p>
+        <p class="font-mono text-2xl font-bold text-[#DC2626]">₹{{ formatAmount(txStore.totalWithdrawals ?? 0) }}</p>
+        <p class="text-[#94A3B8] text-xs mt-1">Net: ₹{{ formatAmount(txStore.netChange ?? 0) }}</p>
       </div>
     </div>
 
@@ -193,7 +193,7 @@
 
         <!-- Empty state -->
         <div
-          v-else-if="txStore.transactions.length === 0"
+          v-else-if="!txStore.transactions?.length"
           class="flex flex-col items-center justify-center py-10 text-center"
         >
           <div class="w-12 h-12 rounded-2xl bg-[#F0F4F8] flex items-center justify-center mb-3">
@@ -208,7 +208,7 @@
         <!-- Transactions list -->
         <div v-else class="space-y-1">
           <TransactionRow
-            v-for="tx in txStore.transactions.slice(0, 6)"
+            v-for="tx in (txStore.transactions ?? []).slice(0, 6)"
             :key="tx._id"
             :transaction="tx"
           />
@@ -244,7 +244,7 @@ const form = reactive<{ type: TransactionType; amount: number | ''; note: string
   note:   '',
 })
 
-onMounted(() => txStore.fetchTransactions({ page: 1, limit: 6 }))
+onMounted(() => txStore?.fetchTransactions?.({ page: 1, limit: 6 }))
 
 const handleAdd = async () => {
   if (adding.value) return
@@ -272,6 +272,11 @@ const handleAdd = async () => {
 
   // Step 3: Hit backend
   try {
+    if (!txStore?.addTransaction) {
+      formError.value = 'Transaction service unavailable. Try again.'
+      adding.value = false
+      return
+    }
     await txStore.addTransaction({
       type:   form.type,
       amount: Number(form.amount),

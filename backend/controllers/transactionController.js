@@ -134,3 +134,33 @@ export const getTransactions = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+// @desc  Edit transaction note
+// @route PUT /api/transactions/:id/note
+// @access Private
+export const editTransactionNote = async (req, res) => {
+  try {
+    const { note } = req.body
+    const userId = req.user._id
+
+    const transaction = await Transaction.findOne({
+      _id: req.params.id,
+      user: userId, // ensure user owns this transaction
+    })
+
+    if (!transaction) {
+      return res.status(404).json({ message: "Transaction not found" })
+    }
+
+    transaction.note = note?.trim() || ""
+    await transaction.save()
+
+    res.json({
+      message: "Note updated successfully",
+      transaction,
+    })
+  } catch (error) {
+    console.error("Edit note error:", error)
+    res.status(500).json({ message: "Error updating note" })
+  }
+}
