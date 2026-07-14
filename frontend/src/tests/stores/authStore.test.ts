@@ -12,7 +12,6 @@ const mockAuthApi = authApi as {
   loginApi:          ReturnType<typeof vi.fn>
   logoutApi:         ReturnType<typeof vi.fn>
   getProfileApi:     ReturnType<typeof vi.fn>
-  updateBalanceApi:  ReturnType<typeof vi.fn>
   updateUserApi:     ReturnType<typeof vi.fn>
   forgotPasswordApi: ReturnType<typeof vi.fn>
   verifyForgotOtpApi:ReturnType<typeof vi.fn>
@@ -132,32 +131,6 @@ describe('authStore', () => {
 
       expect(store.isAuthenticated).toBe(true)
       expect(store.user?.currentBalance).toBe(750)
-    })
-  })
-
-  // ─── updateBalance ───────────────────────────────────────────────────────
-  describe('updateBalance', () => {
-    it('updates currentBalance on user when user exists', async () => {
-      mockAuthApi.loginApi.mockResolvedValueOnce({
-        data: { _id: 'u1', name: 'Alice', email: 'alice@example.com', token: 'tok', message: 'ok' },
-      })
-      mockAuthApi.updateBalanceApi.mockResolvedValueOnce({
-        data: { message: 'updated', currentBalance: 2000 },
-      })
-      const store = useAuthStore()
-      await store.login({ email: 'alice@example.com', password: 'pass' })
-
-      await store.updateBalance({ currentBalance: 2000 })
-
-      expect(store.user?.currentBalance).toBe(2000)
-    })
-
-    it('does not throw when user is null', async () => {
-      mockAuthApi.updateBalanceApi.mockResolvedValueOnce({
-        data: { message: 'updated', currentBalance: 500 },
-      })
-      const store = useAuthStore()
-      await expect(store.updateBalance({ currentBalance: 500 })).resolves.toBeDefined()
     })
   })
 

@@ -41,10 +41,6 @@ export const logoutApi = () =>
 export const getProfileApi = () =>
   api.get<ProfileResponse>(`${BASE}/profile`)
 
-// ─── Update Balance -───
-export const updateBalanceApi = (payload: UpdateBalancePayload) =>
-  api.put<UpdateBalanceResponse>(`${BASE}/update-balance`, payload)
-
 // ─── Update User Details ─
 export const updateUserApi = (payload: UpdateUserPayload) =>
   api.put<MessageResponse>(`${BASE}/update-user`, payload)
