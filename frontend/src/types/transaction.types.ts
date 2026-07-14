@@ -57,3 +57,8 @@ export interface EditNoteResponse {
   message: string
   transaction: Transaction
 }
+
+export interface DeleteTransactionResponse {
+  message: string
+  currentBalance: number
+}

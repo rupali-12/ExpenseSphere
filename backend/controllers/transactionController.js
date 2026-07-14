@@ -164,3 +164,47 @@ export const editTransactionNote = async (req, res) => {
     res.status(500).json({ message: "Error updating note" })
   }
 }
+
+// @desc  Delete transaction and reverse balance
+// @route DELETE /api/transactions/:id
+// @access Private
+export const deleteTransaction = async (req, res) => {
+  try {
+    const userId = req.user._id
+
+    const transaction = await Transaction.findOne({
+      _id: req.params.id,
+      user: userId,
+    })
+
+    if (!transaction) {
+      return res.status(404).json({ message: "Transaction not found" })
+    }
+
+    const user = await User.findById(userId)
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    // Reverse the balance impact
+    if (transaction.type === "deposit") {
+      user.currentBalance -= transaction.amount
+    } else if (transaction.type === "withdrawal") {
+      user.currentBalance += transaction.amount
+    }
+
+    // Ensure balance never goes negative
+    if (user.currentBalance < 0) user.currentBalance = 0
+
+    await user.save()
+    await transaction.deleteOne()
+
+    res.json({
+      message: "Transaction deleted successfully",
+      currentBalance: user.currentBalance,
+    })
+  } catch (error) {
+    console.error("Delete transaction error:", error)
+    res.status(500).json({ message: "Error deleting transaction" })
+  }
+}

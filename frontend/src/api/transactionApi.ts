@@ -2,6 +2,7 @@ import api from './axiosInstance'
 import type {
   AddTransactionPayload,
   AddTransactionResponse,
+  DeleteTransactionResponse,
   EditNotePayload,
   EditNoteResponse,
   GetTransactionsResponse,
@@ -26,3 +27,6 @@ export const getTransactionsApi = (filters: TransactionFilters = {}) => {
 
 export const editTransactionNoteApi = (id: string, payload: EditNotePayload) =>
   api.put<EditNoteResponse>(`${BASE}/${id}/note`, payload)
+
+export const deleteTransactionApi = (id: string) =>
+  api.delete<DeleteTransactionResponse>(`${BASE}/${id}`)

@@ -10,7 +10,7 @@ router.post("/resend-otp", resendOTP);
 router.post('/login', loginUser);
 router.post('/logout', logoutUser);
 router.get('/profile', protect, getProfile);
-router.put("/update-balance", protect, updateBalance);
+// router.put("/update-balance", protect, updateBalance);
 router.post("/forgot-password", forgotPassword);
 router.post("/verify-forgot-otp", verifyForgotOTP);
 router.post("/reset-password", resetPassword);

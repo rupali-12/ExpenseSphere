@@ -4,6 +4,7 @@ import {
   addTransaction,
   getTransactions,
   editTransactionNote,
+  deleteTransaction,
 } from "../controllers/transactionController.js";
 
 const router = express.Router();
@@ -16,5 +17,8 @@ router.get("/get-transactions", protect, getTransactions);
 
 // Edit trasaction note
 router.put("/:id/note", protect, editTransactionNote) 
+
+// Delete transaction
+router.delete("/:id", protect, deleteTransaction)
 
 export default router;

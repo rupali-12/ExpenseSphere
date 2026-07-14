@@ -6,7 +6,6 @@ import type {
   RegisterPayload,
   VerifyOtpPayload,
   UpdateUserPayload,
-  UpdateBalancePayload,
   ForgotPasswordPayload,
   VerifyForgotOtpPayload,
   ResetPasswordPayload,
@@ -18,7 +17,6 @@ import {
   resendOtpApi,
   logoutApi,
   getProfileApi,
-  updateBalanceApi,
   updateUserApi,
   forgotPasswordApi,
   verifyForgotOtpApi,
@@ -83,15 +81,6 @@ const login = async (payload: LoginPayload) => {
   return response.data
 }
 
-  // ─── Update Balance -────
-  const updateBalance = async (payload: UpdateBalancePayload) => {
-    const response = await updateBalanceApi(payload)
-    if (user.value) {
-      user.value.currentBalance = response.data.currentBalance
-    }
-    return response.data
-  }
-
   // ─── Update User Details -───
   const updateUser = async (payload: UpdateUserPayload) => {
     const response = await updateUserApi(payload)
@@ -133,7 +122,6 @@ const login = async (payload: LoginPayload) => {
     login,
     logout,
     fetchProfile,
-    updateBalance,
     updateUser,
     forgotPassword,
     verifyForgotOtp,
